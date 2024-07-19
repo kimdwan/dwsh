@@ -23,6 +23,9 @@ type User struct {
 	User_nickname      *string    `gorm:"type:varchar(255);unique;"`
 	User_birthday      *time.Time `gorm:"type:date;"`
 	User_secretkey     *string    `gorm:"type:varchar(255);unique;"`
+	User_term_agree_1  bool       `gorm:"type:boolean;default:false;not null;"`
+	User_term_agree_2  bool       `gorm:"type:boolean;default:false;not null"`
+	User_term_agree_3  bool       `gorm:"type:boolean;not null"`
 	User_access_token  *string    `gorm:"type:varchar(255);unique"`
 	User_refresh_token *string    `gorm:"type:varchar(255);unique"`
 }
@@ -159,6 +162,12 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 		}
 	}
 
+	// 유저의 필수 동의 여부를 파악하는 로직
+
+	if !u.User_term_agree_1 || !u.User_term_agree_2 {
+		return errors.New("1번과 2번은 필수 동의 사항입니다")
+	}
+
 	return nil
 
 }
@@ -289,6 +298,11 @@ func (u *User) BeforeSave(tx *gorm.DB) (err error) {
 
 			return errors.New("유저의 시크릿 키는 " + secretkeyErrorMsg + " 중 하나입니다")
 		}
+	}
+
+	// 필수 동의사항 체크 여부 확인 로직
+	if !u.User_term_agree_1 || !u.User_term_agree_2 {
+		return errors.New("유저는 1번과 2번 동의사항은 필수로 작성해야 합니다")
 	}
 
 	return nil
