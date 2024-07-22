@@ -81,3 +81,15 @@ func UserLoginController(ctx *gin.Context) {
 		"computer_number": computer_number,
 	})
 }
+
+// 간접적인 데이터와 관련된 서비스
+func UserEtcGetMainProfileController(ctx *gin.Context) {
+	var (
+		img_file string
+	)
+
+	// 메인 이미지가 저장된 장소
+	services.UserEtcGetMainProfileService(&img_file)
+
+	ctx.File(img_file)
+}

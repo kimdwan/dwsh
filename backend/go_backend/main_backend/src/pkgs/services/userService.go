@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -324,4 +325,17 @@ func UserLoginMakeComputerNumberAndSaveDatabaseFunc(c context.Context, db *gorm.
 	}
 
 	return nil
+}
+
+// 메인 이미지의 파일 위치를 찾고 보내는 로직
+func UserEtcGetMainProfileService(img_path *string) {
+	var (
+		data_server_path      string = os.Getenv("DATA_FILE_SERVER")
+		baseimg_file_path     string = os.Getenv("DATA_FILE_BASE_SERVER")
+		main_profile_img_path string = os.Getenv("DATABASE_BASE_MAIN_IMG")
+	)
+
+	// 메인 이미지가 저장되는 장소
+	*img_path = filepath.Join(data_server_path, baseimg_file_path, main_profile_img_path)
+
 }

@@ -2,3 +2,6 @@
 
 # go 
 backend/go_backend/main_backend/.env
+
+## 공동 
+data_server
