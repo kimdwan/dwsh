@@ -3,5 +3,11 @@
 # go 
 backend/go_backend/main_backend/.env
 
+## 프론트엔드
+
+# react
+frontend/react_frontend/main_frontend/node_modules
+frontend/react_frontend/main_frontend/build
+
 ## 공동 
 data_server
