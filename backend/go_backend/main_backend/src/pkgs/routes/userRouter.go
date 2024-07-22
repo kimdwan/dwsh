@@ -9,6 +9,7 @@ import (
 func UserRouter(router *gin.Engine) {
 	userrouter := router.Group("user")
 
-	// 기본 유저 회원가입 경로
+	// 기본 유저 라우터
 	userrouter.POST("signup", middlewares.UserCheckUserTypeMiddleware(), controllers.UserSignUpController)
+	userrouter.POST("login", controllers.UserLoginController)
 }

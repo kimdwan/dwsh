@@ -29,7 +29,7 @@ func UserCheckUserTypeMiddleware() gin.HandlerFunc {
 		}
 
 		// 이용약간 동의 확인하기
-		if err = UserCheckUserTypeCheckTermAgreeOneAndTwo(body); err != nil {
+		if err = UserCheckUserTypeCheckTermAgreeOneAndTwoFunc(body); err != nil {
 			fmt.Println(err.Error())
 			ctx.AbortWithStatus(http.StatusBadGateway)
 			return
@@ -117,7 +117,7 @@ func UserCheckUserTypeCheckDsUserFunc(body *dtos.UserSignUpDto) (int, error) {
 }
 
 // 필수 사항을 동의 했는지 확인하는 로직
-func UserCheckUserTypeCheckTermAgreeOneAndTwo(body *dtos.UserSignUpDto) (err error) {
+func UserCheckUserTypeCheckTermAgreeOneAndTwoFunc(body *dtos.UserSignUpDto) (err error) {
 	if !body.Term_agree_1 || !body.Term_agree_2 {
 		return errors.New("필수 사항 두개는 동의를 하셔야 합니다")
 	}

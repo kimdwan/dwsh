@@ -14,20 +14,21 @@ import (
 type User struct {
 	gorm.Model
 
-	User_id            uuid.UUID  `gorm:"type:uuid;unique;"`
-	User_type          string     `gorm:"type:varchar(255);not null;"`
-	User_email         string     `gorm:"type:varchar(255);unique;not null;"`
-	User_hash          []byte     `gorm:"type:varchar(255);not null;"`
-	User_name          string     `gorm:"type:varchar(255);not null;"`
-	User_pf_img        *string    `gorm:"type:varchar(255);"`
-	User_nickname      *string    `gorm:"type:varchar(255);unique;"`
-	User_birthday      *time.Time `gorm:"type:date;"`
-	User_secretkey     *string    `gorm:"type:varchar(255);unique;"`
-	User_term_agree_1  bool       `gorm:"type:boolean;default:false;not null;"`
-	User_term_agree_2  bool       `gorm:"type:boolean;default:false;not null"`
-	User_term_agree_3  bool       `gorm:"type:boolean;not null"`
-	User_access_token  *string    `gorm:"type:varchar(255);unique"`
-	User_refresh_token *string    `gorm:"type:varchar(255);unique"`
+	User_id              uuid.UUID  `gorm:"type:uuid;unique;"`
+	User_type            string     `gorm:"type:varchar(255);not null;"`
+	User_email           string     `gorm:"type:varchar(255);unique;not null;"`
+	User_hash            []byte     `gorm:"not null;"`
+	User_name            string     `gorm:"type:varchar(255);not null;"`
+	User_pf_img          *string    `gorm:"type:varchar(255);"`
+	User_nickname        *string    `gorm:"type:varchar(255);unique;"`
+	User_birthday        *time.Time `gorm:"type:date;"`
+	User_secretkey       *string    `gorm:"type:varchar(255);unique;"`
+	User_term_agree_1    bool       `gorm:"type:boolean;default:false;not null;"`
+	User_term_agree_2    bool       `gorm:"type:boolean;default:false;not null;"`
+	User_term_agree_3    bool       `gorm:"type:boolean;not null;"`
+	User_access_token    *string    `gorm:"unique;"`
+	User_refresh_token   *string    `gorm:"unique;"`
+	User_computer_number *uuid.UUID `gorm:"type:uuid;unique;"`
 }
 
 // 데이터 생성시 확인하는 로직

@@ -17,4 +17,6 @@
 - DS_USER_TB 데이터 베이스에 필수사항열 추가 
 
 3. 07/22 
+- DS_USER_TB 데이터 베이스에 User_computer_number 열 추가 
 - 회원가입 로직 설계 
+- 로그인 로직 설계

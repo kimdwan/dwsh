@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/kimdwan/dwsh/settings"
 	"github.com/kimdwan/dwsh/src/dtos"
 	"github.com/kimdwan/dwsh/src/models"
@@ -18,7 +21,7 @@ import (
 )
 
 // user와 관련된 곳에서 사용하는 파싱 and 검증 함수
-func ParseAndCheckBodyVerUser[T dtos.UserSignUpDto](ctx *gin.Context) (*T, error) {
+func ParseAndCheckBodyVerUser[T dtos.UserSignUpDto | dtos.UserLoginDto](ctx *gin.Context) (*T, error) {
 	var (
 		body T
 		err  error
@@ -161,4 +164,164 @@ func UserSignUpCreateUserFunc(c context.Context, db *gorm.DB, signup_dto *dtos.U
 
 	return nil
 
+}
+
+// 로그인을 담당하는 함수
+func UserLoginService(c context.Context, login_dto *dtos.UserLoginDto, access_token *string, computer_number *uuid.UUID, messages *string) (int, error) {
+	var (
+		db          *gorm.DB = settings.DB
+		check_user  models.User
+		errorStatus int
+		err         error
+	)
+
+	// 이메일 확인
+	if err = UserLoginCheckEmailFunc(c, db, login_dto, &check_user, &errorStatus); err != nil {
+		return errorStatus, err
+	}
+
+	// 비밀번호 확인
+	if err = UserLoginCheckPasswordFunc(db, login_dto, &check_user, &errorStatus); err != nil {
+		return errorStatus, err
+	}
+
+	// 기존에 로그인 되어있는지 확인하는 함수
+	UserLoginCheckComputerNumberFunc(&check_user, messages)
+
+	// jwt 토큰을 만드는 함수
+	if err = UserLoginMakeJwtTokenFunc(&check_user, access_token, &errorStatus); err != nil {
+		return errorStatus, err
+	}
+
+	// computer_number를 저장하고 데이터 베이스에 마무리까지 하는 함수
+	if err = UserLoginMakeComputerNumberAndSaveDatabaseFunc(c, db, &check_user, computer_number, &errorStatus); err != nil {
+		return errorStatus, err
+	}
+
+	return 0, nil
+
+}
+
+// 이메일을 확인하는 함수
+func UserLoginCheckEmailFunc(c context.Context, db *gorm.DB, login_dto *dtos.UserLoginDto, check_user *models.User, errorStatus *int) error {
+	result := db.WithContext(c).Where("user_email = ?", login_dto.Email).First(check_user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			*errorStatus = http.StatusNotFound
+			return errors.New("해당 이메일은 존재하지 않습니다")
+		} else {
+			fmt.Println("시스템 오류: ", result.Error.Error())
+			*errorStatus = http.StatusInternalServerError
+			return errors.New("이메일에 맞는 데이터 베이스를 찾는데 오류가 발생했습니다")
+		}
+	}
+	return nil
+}
+
+// 비밀번호를 확인하는 함수
+func UserLoginCheckPasswordFunc(db *gorm.DB, login_dto *dtos.UserLoginDto, check_user *models.User, errorStatus *int) (err error) {
+	if err = bcrypt.CompareHashAndPassword(check_user.User_hash, []byte(login_dto.Password)); err != nil {
+		fmt.Println("시스템 오류: ", err.Error())
+		*errorStatus = http.StatusUnauthorized
+		return errors.New("비밀번호가 틀렸습니다")
+	}
+	return nil
+}
+
+// 컴퓨터 함수의 존재 유무를 파악하는 함수
+func UserLoginCheckComputerNumberFunc(check_user *models.User, messages *string) {
+	if check_user.User_computer_number != nil {
+		*messages = "기존에 로그인 되어있는 계정입니다. 기존의 계정을 로그아웃 합니다."
+	} else {
+		*messages = "로그인 되었습니다."
+	}
+}
+
+// jwt 토큰을 만들고 저장하는 함수
+func UserLoginMakeJwtTokenFunc(check_user *models.User, access_token *string, errorStatus *int) (err error) {
+	var (
+		sub     dtos.Sub
+		payload dtos.Payload
+	)
+
+	// payload 제작
+	sub.Email = check_user.User_email
+	sub.Name = check_user.User_name
+	sub.User_type = check_user.User_type
+
+	payload.User_id = check_user.User_id
+	payload.Sub = sub
+
+	var (
+		jwt_secret_keys []string = []string{
+			os.Getenv("JWT_ACCESS_SECRET"),
+			os.Getenv("JWT_REFRESH_SECRET"),
+		}
+		jwt_time_strs []string = []string{
+			os.Getenv("JWT_ACCESS_TIME"),
+			os.Getenv("JWT_REFRESH_TIME"),
+		}
+		jwt_tokens []string
+	)
+
+	for idx, jwt_secret_key := range jwt_secret_keys {
+
+		// jwt의 시간을 파싱하는 로직
+		var (
+			jwt_time int
+		)
+
+		if jwt_time, err = strconv.Atoi(jwt_time_strs[idx]); err != nil {
+			fmt.Println("시스템 오류: ", err.Error())
+			*errorStatus = http.StatusInternalServerError
+			return errors.New("문자열인 시간을 숫자로 파싱하는데 오류가 발생했습니다")
+		}
+
+		// jwt 토큰을 만드는 함수
+		var (
+			jwt_token string
+		)
+
+		jwt_token_str := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"exp":     jwt_time,
+			"payload": payload,
+		})
+
+		if jwt_token, err = jwt_token_str.SignedString([]byte(jwt_secret_key)); err != nil {
+			fmt.Println("시스템 오류: ", err.Error())
+			*errorStatus = http.StatusInternalServerError
+			return errors.New("jwt 토큰을 생성하는데 오류가 발생했습니다")
+		}
+
+		jwt_tokens = append(jwt_tokens, jwt_token)
+
+	}
+
+	// 데이터베이스에 킵
+	check_user.User_access_token = &jwt_tokens[0]
+	check_user.User_refresh_token = &jwt_tokens[1]
+
+	*access_token = jwt_tokens[0]
+
+	return nil
+}
+
+// 컴퓨터 넘버를 만들고 데이터 베이스에 저장까지 하는 함수
+func UserLoginMakeComputerNumberAndSaveDatabaseFunc(c context.Context, db *gorm.DB, check_user *models.User, computer_number *uuid.UUID, errorStatus *int) error {
+
+	// 컴퓨터 넘버 만들기
+	*computer_number = uuid.New()
+
+	// 데이터 베이스에 저장하는 로직
+	check_user.User_computer_number = computer_number
+
+	result := db.WithContext(c).Save(&check_user)
+	if result.Error != nil {
+		fmt.Println("시스템 오류: ", result.Error.Error())
+		*errorStatus = http.StatusInternalServerError
+		return errors.New("데이터 베이스에 인증 데이터 관련을 저장하는데 오류가 발생했습니다")
+	}
+
+	return nil
 }
