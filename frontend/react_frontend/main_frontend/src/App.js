@@ -1,5 +1,5 @@
 import { BrowserRouter as Routers, Routes, Route } from "react-router-dom"
-import { Main } from "./pkgs/index"
+import { Main } from "./pkgs"
 
 function App() {
   return (
