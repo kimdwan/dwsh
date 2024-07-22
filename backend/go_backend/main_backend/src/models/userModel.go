@@ -17,7 +17,7 @@ type User struct {
 	User_id            uuid.UUID  `gorm:"type:uuid;unique;"`
 	User_type          string     `gorm:"type:varchar(255);not null;"`
 	User_email         string     `gorm:"type:varchar(255);unique;not null;"`
-	User_hash          string     `gorm:"type:varchar(255);not null;"`
+	User_hash          []byte     `gorm:"type:varchar(255);not null;"`
 	User_name          string     `gorm:"type:varchar(255);not null;"`
 	User_pf_img        *string    `gorm:"type:varchar(255);"`
 	User_nickname      *string    `gorm:"type:varchar(255);unique;"`
