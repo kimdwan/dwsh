@@ -2,8 +2,10 @@ package services
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -168,7 +170,7 @@ func UserSignUpCreateUserFunc(c context.Context, db *gorm.DB, signup_dto *dtos.U
 }
 
 // 로그인을 담당하는 함수
-func UserLoginService(c context.Context, login_dto *dtos.UserLoginDto, access_token *string, computer_number *uuid.UUID, messages *string) (int, error) {
+func UserLoginService(c context.Context, login_dto *dtos.UserLoginDto, access_token *string, computer_number *uuid.UUID, messages *string, user_type *string) (int, error) {
 	var (
 		db          *gorm.DB = settings.DB
 		check_user  models.User
@@ -194,8 +196,8 @@ func UserLoginService(c context.Context, login_dto *dtos.UserLoginDto, access_to
 		return errorStatus, err
 	}
 
-	// computer_number를 저장하고 데이터 베이스에 마무리까지 하는 함수
-	if err = UserLoginMakeComputerNumberAndSaveDatabaseFunc(c, db, &check_user, computer_number, &errorStatus); err != nil {
+	// computer_number를 저장하고 유저 타입까지 불러오기 데이터 베이스에 마무리까지 하는 함수
+	if err = UserLoginMakeComputerNumberAndSaveDatabaseFunc(c, db, &check_user, computer_number, user_type, &errorStatus); err != nil {
 		return errorStatus, err
 	}
 
@@ -309,10 +311,13 @@ func UserLoginMakeJwtTokenFunc(check_user *models.User, access_token *string, er
 }
 
 // 컴퓨터 넘버를 만들고 데이터 베이스에 저장까지 하는 함수
-func UserLoginMakeComputerNumberAndSaveDatabaseFunc(c context.Context, db *gorm.DB, check_user *models.User, computer_number *uuid.UUID, errorStatus *int) error {
+func UserLoginMakeComputerNumberAndSaveDatabaseFunc(c context.Context, db *gorm.DB, check_user *models.User, computer_number *uuid.UUID, user_type *string, errorStatus *int) error {
 
 	// 컴퓨터 넘버 만들기
 	*computer_number = uuid.New()
+
+	// 유저 타입 지정
+	*user_type = check_user.User_type
 
 	// 데이터 베이스에 저장하는 로직
 	check_user.User_computer_number = computer_number
@@ -328,14 +333,23 @@ func UserLoginMakeComputerNumberAndSaveDatabaseFunc(c context.Context, db *gorm.
 }
 
 // 메인 이미지의 파일 위치를 찾고 보내는 로직
-func UserEtcGetMainProfileService(img_path *string) {
+func UserEtcGetMainProfileService(base64Img *string) error {
 	var (
 		data_server_path      string = os.Getenv("DATA_FILE_SERVER")
 		baseimg_file_path     string = os.Getenv("DATA_FILE_BASE_SERVER")
 		main_profile_img_path string = os.Getenv("DATABASE_BASE_MAIN_IMG")
 	)
 
-	// 메인 이미지가 저장되는 장소
-	*img_path = filepath.Join(data_server_path, baseimg_file_path, main_profile_img_path)
+	// 메인 이미지의 위치가 나오는 장소
+	img_path := filepath.Join(data_server_path, baseimg_file_path, main_profile_img_path)
 
+	// 이미지를 바이트 형식으로 읽고 base64로 인코딩 하는 로직
+	imgData, err := ioutil.ReadFile(img_path)
+	if err != nil {
+		fmt.Println("시스템 오류: ", err.Error())
+		return errors.New("메인 이미지를 읽는데 오류가 발생했습니다")
+	}
+
+	*base64Img = base64.StdEncoding.EncodeToString(imgData)
+	return nil
 }

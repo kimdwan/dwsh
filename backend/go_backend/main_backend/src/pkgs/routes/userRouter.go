@@ -7,6 +7,10 @@ import (
 )
 
 func UserRouter(router *gin.Engine) {
+	// 테스트를 위한 라우터
+	testrouter := router.Group("test")
+	testrouter.GET("one", controllers.UserTestController)
+
 	// 유저 개인을 위한 라우터
 	userrouter := router.Group("user")
 

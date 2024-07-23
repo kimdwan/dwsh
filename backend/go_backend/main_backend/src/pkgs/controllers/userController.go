@@ -13,6 +13,13 @@ import (
 	"github.com/kimdwan/dwsh/src/pkgs/services"
 )
 
+// 테스트를 담당하는 로직
+func UserTestController(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "테스트 완료",
+	})
+}
+
 // 회원가입을 담당하는 로직
 func UserSignUpController(ctx *gin.Context) {
 
@@ -50,6 +57,7 @@ func UserLoginController(ctx *gin.Context) {
 	var (
 		login_dto       *dtos.UserLoginDto
 		access_token    string
+		user_type       string
 		computer_number uuid.UUID
 		messages        string
 		errorStatus     int
@@ -66,7 +74,7 @@ func UserLoginController(ctx *gin.Context) {
 	// 로그인 로직
 	c, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
-	if errorStatus, err = services.UserLoginService(c, login_dto, &access_token, &computer_number, &messages); err != nil {
+	if errorStatus, err = services.UserLoginService(c, login_dto, &access_token, &computer_number, &messages, &user_type); err != nil {
 		fmt.Println(err.Error())
 		ctx.AbortWithStatus(errorStatus)
 		return
@@ -78,6 +86,7 @@ func UserLoginController(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message":         messages,
+		"user_type":       user_type,
 		"computer_number": computer_number,
 	})
 }
@@ -85,11 +94,18 @@ func UserLoginController(ctx *gin.Context) {
 // 간접적인 데이터와 관련된 서비스
 func UserEtcGetMainProfileController(ctx *gin.Context) {
 	var (
-		img_file string
+		base64Img string
+		err       error
 	)
 
 	// 메인 이미지가 저장된 장소
-	services.UserEtcGetMainProfileService(&img_file)
+	if err = services.UserEtcGetMainProfileService(&base64Img); err != nil {
+		fmt.Println(err.Error())
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
 
-	ctx.File(img_file)
+	ctx.JSON(http.StatusOK, gin.H{
+		"base64Img": base64Img,
+	})
 }

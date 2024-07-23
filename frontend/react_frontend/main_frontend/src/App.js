@@ -1,5 +1,5 @@
 import { BrowserRouter as Routers, Routes, Route } from "react-router-dom"
-import { Main } from "./pkgs"
+import { Main, SignUpOne } from "./pkgs"
 
 function App() {
   return (
@@ -8,6 +8,7 @@ function App() {
 
         <Routes>
           <Route path = "/" element = {<Main />} />
+          <Route path = "/signup/" element = {<SignUpOne />} />
         </Routes>
 
       </Routers>

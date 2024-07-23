@@ -10,12 +10,11 @@ import (
 
 func CorsMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
 		var (
-			origin         string   = ctx.GetHeader("Origin")
-			isAllowed      bool     = false
-			backend_hosts  []string = strings.Split(os.Getenv("GO_BACKEND_HOSTS"), ",")
-			frontend_hosts []string = strings.Split(os.Getenv("GO_FRONTEND_HOSTS"), ",")
+			origin         = ctx.GetHeader("Origin")
+			isAllowed      = false
+			backend_hosts  = strings.Split(os.Getenv("GO_BACKEND_HOSTS"), ",")
+			frontend_hosts = strings.Split(os.Getenv("GO_FRONTEND_HOSTS"), ",")
 		)
 
 		allowed_hosts := append(backend_hosts, frontend_hosts...)
@@ -30,8 +29,8 @@ func CorsMiddleware() gin.HandlerFunc {
 		if isAllowed {
 			ctx.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 			ctx.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-			ctx.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Origin")
-			ctx.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET")
+			ctx.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Origin, X-Requested-With, Authorization")
+			ctx.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		}
 
 		if ctx.Request.Method == "OPTIONS" {
