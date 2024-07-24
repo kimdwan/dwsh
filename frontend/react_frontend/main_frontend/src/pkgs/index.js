@@ -1,2 +1,5 @@
 export * from "./Main/Main"
 export * from "./SignUpOne/SignUpOne"
+export * from "./SignUpTwo/SignUpTwo"
+export * from "./SignUpDs/SignUpDs"
+export * from "./SignUpGuest/SignUpGuest"

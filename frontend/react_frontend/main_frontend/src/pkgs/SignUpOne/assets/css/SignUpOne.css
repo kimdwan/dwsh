@@ -1,0 +1,59 @@
+.SignUpOneWhoContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.SignUpOneWhoIntro {
+  margin-bottom: 20px;
+}
+
+.SignUpOneWhoIntroValue {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.SignUpOneWhoRoute {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.SignUpOneWhoRouteDs,
+.SignUpOneWhoRouteGuest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.SignUpOneWhoRouteDsValue,
+.SignUpOneWhoRouteGuestValue {
+  font-size: 20px;
+  cursor: pointer; /* 마우스 포인터 설정 */
+}
+
+.SignUpOneWhoRouteDsHidden,
+.SignUpOneWhoRouteGuestHidden {
+  margin-top: 10px;
+}
+
+.SignUpOneWhoRouteDsHiddenValue,
+.SignUpOneWhoRouteGuestHiddenValue {
+  font-size: 16px;
+  color: #555;
+}
+
+.welcomeImage {
+  margin-bottom: 20px;
+}
+
+.welcomeText {
+  margin-bottom: 20px;
+  font-size: 18px;
+}
