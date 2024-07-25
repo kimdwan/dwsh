@@ -92,7 +92,7 @@ func UserCheckUserTypeCheckDsUserFunc(body *dtos.UserSignUpDto) (int, error) {
 		return http.StatusInternalServerError, errors.New("클라이언트가 보낸 첫번째 날을 파싱하는데 오류가 발생했습니다")
 	}
 
-	if our_first_day != system_first_day {
+	if our_first_day != system_first_day.Add(time.Hour*24) {
 		return http.StatusNotAcceptable, errors.New("첫번째 날을 맞추지 못했습니다")
 	}
 

@@ -16,3 +16,5 @@
 4. useNavigate는 최상단에 위치 해야 한다. 
 5. textare를 읽기 전용으로 하려면 readonly를 추가해야 한다.
 6. useState의 set함수는 return 값에 따라서 값을 변경시킬수 있다.
+7. setError을 사용해서 error 메세지를 내가 조작 할 수 있다.
+8. yup.transform을 사용해서 기존의 값의 따라서 value 값을 조절할 수 있다.
