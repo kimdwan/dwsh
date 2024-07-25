@@ -24,6 +24,9 @@ export const useSignUpDsSignUpFormHook = (userAgree3, userType) => {
 
   const onSubmit = async (data) => {
 
+    // 확인용 비밀번호 삭제
+    delete data["confirm_password"]
+
     // 동의 사항 체크
     Array.from(["term_agree_1" ,"term_agree_2", "term_agree_3"]).forEach(( term_name, idx ) => {
       if (idx !== 2) {

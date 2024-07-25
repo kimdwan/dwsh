@@ -41,6 +41,7 @@ export const SignUpDsSignUpFormFetch = async ( url, datas, setError ) => {
         alert("서버에 오류가 발생했습니다.")  
         throw new Error("서버에 오류가 발생했습니다.")
       } else {
+        alert("알수 없는 오류 발생")
         throw new Error(`오류가 발생했습니다 오류번호: ${response.status}`)
       }
     }
