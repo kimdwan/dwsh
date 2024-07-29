@@ -12,7 +12,7 @@ export const useMainGetProfileHook = () => {
       try {
         const response = await MainGetProfileImgFetch(url)
         if (response) {
-          setMainImg(`data:image/webp;base64,${response["base64Img"]}`)
+          setMainImg(`data:image/${response["imgType"]};base64,${response["base64Img"]}`)
         }
 
       }catch (err) {
