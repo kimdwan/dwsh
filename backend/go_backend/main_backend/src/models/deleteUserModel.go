@@ -15,20 +15,16 @@ import (
 
 type DeleteUser struct {
 	gorm.Model
-	// 유저 아이디가 실제로 존재하는지 확인하는 로직 필요
-	User_id uuid.UUID `gorm:"type:uuid;unique;not null"`
-	// 유저의 타입이 지정한 환경변수 안에 있어야 함을 확인할 함수 만들어야 함
-	User_type string `gorm:"type:varchar(255);not null;"`
-	// 이메일 타입을 확인 하는 로직 필요
-	User_email    string     `gorm:"not null;"`
-	User_name     string     `gorm:"type:varchar(255);not null;"`
-	User_nickname *string    `gorm:"type:varchar(255);"`
-	User_birthday *time.Time `gorm:"type:date;"`
-	// 조건의 1번과 2번이 제대로 저장 되었는지 확인 필요
-	User_term_agree_1 bool   `gorm:"type:boolean;default:false;not null;"`
-	User_term_agree_2 bool   `gorm:"type:boolean;default:false;not null;"`
-	User_term_agree_3 bool   `gorm:"type:boolean;not null;"`
-	User_feedback     string `gorm:"type:varchar(500);not null;"`
+	User_id           uuid.UUID  `gorm:"type:uuid;unique;not null"`
+	User_type         string     `gorm:"type:varchar(255);not null;"`
+	User_email        string     `gorm:"not null;"`
+	User_name         string     `gorm:"type:varchar(255);not null;"`
+	User_nickname     *string    `gorm:"type:varchar(255);"`
+	User_birthday     *time.Time `gorm:"type:date;"`
+	User_term_agree_1 bool       `gorm:"type:boolean;default:false;not null;"`
+	User_term_agree_2 bool       `gorm:"type:boolean;default:false;not null;"`
+	User_term_agree_3 bool       `gorm:"type:boolean;not null;"`
+	User_feedback     string     `gorm:"type:varchar(500);not null;"`
 }
 
 func (d *DeleteUser) BeforeCreate(tx *gorm.DB) error {

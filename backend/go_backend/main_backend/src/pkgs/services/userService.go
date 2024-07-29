@@ -333,7 +333,7 @@ func UserLoginMakeComputerNumberAndSaveDatabaseFunc(c context.Context, db *gorm.
 }
 
 // 메인 이미지의 파일 위치를 찾고 보내는 로직
-func UserEtcGetMainProfileService(base64Img *string) error {
+func UserEtcGetMainProfileService(ImageType *dtos.ImageType) error {
 	var (
 		data_server_path      string = os.Getenv("DATA_FILE_SERVER")
 		baseimg_file_path     string = os.Getenv("DATA_FILE_BASE_SERVER")
@@ -350,6 +350,13 @@ func UserEtcGetMainProfileService(base64Img *string) error {
 		return errors.New("메인 이미지를 읽는데 오류가 발생했습니다")
 	}
 
-	*base64Img = base64.StdEncoding.EncodeToString(imgData)
+	ImageType.Base64Img = base64.StdEncoding.EncodeToString(imgData)
+
+	// 메인 이미지에 타입을 정하는 로직
+	var (
+		main_profile_img_path_list []string = strings.Split(main_profile_img_path, ".")
+	)
+	ImageType.ImgType = main_profile_img_path_list[len(main_profile_img_path_list)-1]
+
 	return nil
 }

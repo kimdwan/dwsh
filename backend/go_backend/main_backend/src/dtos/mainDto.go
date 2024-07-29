@@ -13,3 +13,8 @@ type Payload struct {
 	User_id uuid.UUID `json:"user_id"`
 	Sub     Sub       `json:"sub"`
 }
+
+type ImageType struct {
+	Base64Img string `json:"base64Img"`
+	ImgType   string `json:"imgType"`
+}
