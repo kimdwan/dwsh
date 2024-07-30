@@ -34,6 +34,7 @@ func main() {
 
 	// 라우터 목록
 	routes.UserRouter(router)
+	routes.AuthRouter(router)
 
 	router.Run(port)
 }

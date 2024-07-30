@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -287,7 +288,7 @@ func UserLoginMakeJwtTokenFunc(check_user *models.User, access_token *string, er
 		)
 
 		jwt_token_str := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"exp":     jwt_time,
+			"exp":     time.Now().Add(time.Duration(jwt_time) * time.Second).Unix(),
 			"payload": payload,
 		})
 
@@ -357,6 +358,33 @@ func UserEtcGetMainProfileService(ImageType *dtos.ImageType) error {
 		main_profile_img_path_list []string = strings.Split(main_profile_img_path, ".")
 	)
 	ImageType.ImgType = main_profile_img_path_list[len(main_profile_img_path_list)-1]
+
+	return nil
+}
+
+func UserEtcGetMainLogoService(imgtypes *dtos.ImageType) error {
+	var (
+		server_path   string = os.Getenv("DATA_FILE_SERVER")
+		base_img_path string = os.Getenv("DATA_FILE_BASE_SERVER")
+		logo_img_path string = os.Getenv("DATABASE_BASE_MAIN_LOGO")
+	)
+
+	want_logo_path := filepath.Join(server_path, base_img_path, logo_img_path)
+
+	file_byte, err := ioutil.ReadFile(want_logo_path)
+	if err != nil {
+		fmt.Println("시스템 오류: ", err.Error())
+		return errors.New("파일을 byte화 하는데 오류가 발생했습니다")
+	}
+
+	// 이미지를 base64로 인코딩
+	imgtypes.Base64Img = base64.StdEncoding.EncodeToString(file_byte)
+
+	// 파일 타입을 저장
+	var (
+		filelists []string = strings.Split(logo_img_path, ".")
+	)
+	imgtypes.ImgType = filelists[len(filelists)-1]
 
 	return nil
 }

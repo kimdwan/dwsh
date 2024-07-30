@@ -21,4 +21,5 @@ func UserRouter(router *gin.Engine) {
 	// 유저에게 집적 적인 서비스라고 불리기는 애매한 라우터
 	etcrouter := router.Group("etc")
 	etcrouter.GET("main/profile", controllers.UserEtcGetMainProfileController) // 메인 이미지를 전송하는 로직
+	etcrouter.GET("main/logo", controllers.UserEtcGetMainLogoController)       // 메인 로고를 전송하는 로직
 }

@@ -31,3 +31,8 @@
 5. 07/29
 - DS_DELETE_USER_TB 데이터 베이스 설계 (gorm 타입에 맞추어서)
 - image type의 dto를 따로 만들어서 운영
+
+6. 07/30
+- main logo img를 base64와 타입으로 제출하는 로직 완성
+- jwt 인증 로직을 사용하는 auth 라우터 완성
+- jwt 인증 미들웨어 완성

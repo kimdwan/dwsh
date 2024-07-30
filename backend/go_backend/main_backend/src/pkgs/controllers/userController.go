@@ -107,3 +107,19 @@ func UserEtcGetMainProfileController(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, ImageType)
 }
+
+func UserEtcGetMainLogoController(ctx *gin.Context) {
+	var (
+		imgtypes dtos.ImageType
+		err      error
+	)
+
+	if err = services.UserEtcGetMainLogoService(&imgtypes); err != nil {
+		fmt.Println(err.Error())
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, imgtypes)
+
+}
