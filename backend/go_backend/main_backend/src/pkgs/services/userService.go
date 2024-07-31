@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -345,7 +344,7 @@ func UserEtcGetMainProfileService(ImageType *dtos.ImageType) error {
 	img_path := filepath.Join(data_server_path, baseimg_file_path, main_profile_img_path)
 
 	// 이미지를 바이트 형식으로 읽고 base64로 인코딩 하는 로직
-	imgData, err := ioutil.ReadFile(img_path)
+	imgData, err := os.ReadFile(img_path)
 	if err != nil {
 		fmt.Println("시스템 오류: ", err.Error())
 		return errors.New("메인 이미지를 읽는데 오류가 발생했습니다")
@@ -371,7 +370,7 @@ func UserEtcGetMainLogoService(imgtypes *dtos.ImageType) error {
 
 	want_logo_path := filepath.Join(server_path, base_img_path, logo_img_path)
 
-	file_byte, err := ioutil.ReadFile(want_logo_path)
+	file_byte, err := os.ReadFile(want_logo_path)
 	if err != nil {
 		fmt.Println("시스템 오류: ", err.Error())
 		return errors.New("파일을 byte화 하는데 오류가 발생했습니다")
