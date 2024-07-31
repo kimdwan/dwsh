@@ -59,6 +59,7 @@ func AuthGetProfileController(ctx *gin.Context) {
 
 }
 
+// 유저를 로그아웃 해주는 함수
 func AuthUserLogoutController(ctx *gin.Context) {
 	var (
 		payload *dtos.Payload
@@ -83,5 +84,22 @@ func AuthUserLogoutController(ctx *gin.Context) {
 	ctx.SetCookie("Authorization", "", 24*60*60, "", "", false, true)
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "로그아웃 되었습니다.",
+	})
+}
+
+// 유저의 타입을 제공하는 함수
+func AuthGetUserTypeController(ctx *gin.Context) {
+	var (
+		payload *dtos.Payload
+		err     error
+	)
+	if payload, err = services.AuthParsePayloadService(ctx); err != nil {
+		fmt.Println(err.Error())
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"user_type": payload.Sub.User_type,
 	})
 }

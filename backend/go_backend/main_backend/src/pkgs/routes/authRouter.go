@@ -19,4 +19,5 @@ func AuthRouter(router *gin.Engine) {
 	authuserrouter := authrouter.Group("user")
 	authuserrouter.GET("get/profile", controllers.AuthGetProfileController)
 	authuserrouter.GET("logout", controllers.AuthUserLogoutController)
+	authuserrouter.GET("get/usertype", controllers.AuthGetUserTypeController)
 }
